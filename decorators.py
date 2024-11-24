@@ -54,7 +54,7 @@ def register(func):
     return func
 
 
-def repeat(num_times):
+def repeat(_func=None, *, num_times=2):
     """Repeat the inner function `num_times`."""
     def decorator_repeat(func):
         @functools.wraps(func)
@@ -64,4 +64,20 @@ def repeat(num_times):
                 value = func(*args, **kwargs)
             return value
         return wrapper_repeat
-    return decorator_repeat
+
+    if _func is None:
+        return decorator_repeat
+    else:
+        return decorator_repeat(_func)
+
+def count_calls(func):
+    @functools.wraps(func)
+    def wrapper_count_calls(*args, **kwargs):
+        # The member, `num_calls` must be defined (later).
+        # This member, `num_calls`, is the **retained state** and
+        # is the number of calls to this function.
+        wrapper_count_calls.num_calls += 1
+        print(f'Call {wrapper_count_calls.num_calls} of {func.__name__}')
+        return func(*args, **kwargs)
+    wrapper_count_calls.num_calls = 0
+    return wrapper_count_calls
