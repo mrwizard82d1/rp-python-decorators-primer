@@ -4,6 +4,8 @@
 import functools
 import time
 
+from pygments.lexers import func
+
 
 def do_twice(func):
     @functools.wraps(func)
@@ -81,3 +83,30 @@ def count_calls(func):
         return func(*args, **kwargs)
     wrapper_count_calls.num_calls = 0
     return wrapper_count_calls
+
+
+class CountCalls:
+    def __init__(self, func):
+        """Construct an instance.
+
+        Because we are creating a decorator class, the `__init__()` method
+        should:
+
+        - Store a reference to the supplied function, `func`.
+        - Perform any other initialization appropriate to this
+          specific decorator.
+
+        Essentially, the class performs the same "function" as
+        the `wrapper` function in other examples.
+
+        Because this is a class, one must use `functools.update_wrapper()`
+        instead of `functools.wraps`.
+        """
+        functools.update_wrapper(self, func)
+        self.func = func
+        self.num_calls = 0
+
+    def __call__(self, *args, **kwargs):
+        self.num_calls += 1
+        print(f'Call {self.num_calls} of {self.func.__name__}()')
+        return self.func(*args, **kwargs)
